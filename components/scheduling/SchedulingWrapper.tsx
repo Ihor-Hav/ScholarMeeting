@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import type { schedulingWithId } from "@/schemas/scheduling.shared";
+import type { schedulingWithId, schedulingType } from "@/schemas/scheduling.shared";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -97,6 +97,23 @@ export default function SchedulingWrapper({
     setItem(null);
     setMode("create");
     setOpen(true);
+  };
+
+  const handleFormSuccess = async (data?: schedulingWithId) => {
+    if (!data) {
+      setOpen(false);
+      return;
+    }
+
+    if (mode === "create") {
+      setScheduals((prev) => [data, ...prev]);
+    } else if (mode === "edit") {
+      setScheduals((prev) =>
+        prev.map((item) => (item.id === data.id ? data : item)),
+      );
+    }
+
+    setOpen(false);
   };
 
   const counts = useMemo(

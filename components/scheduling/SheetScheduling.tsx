@@ -37,6 +37,7 @@ const SchedulingUpdateForm = dynamic(() =>
 type SheetSchedulingProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess: (scheduling?: schedulingWithId) => void;
   mode: "create" | "edit";
   selectedItem?: schedulingWithId | null;
   organizations: SchedulingOrganizationOption[];
@@ -45,13 +46,14 @@ type SheetSchedulingProps = {
 export default function SheetSchedualing({
   open,
   onOpenChange,
+  onSuccess,
   mode,
   selectedItem,
   organizations,
 }: SheetSchedulingProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="!w-[90vw] sm:!w-[70vw] lg:!w-[35vw] !max-w-none px-5 overflow-y-scroll">
+      <SheetContent className="w-[90vw]! sm:w-[70vw]! lg:w-[35vw]! max-w-none! px-5 overflow-y-scroll">
         <SheetHeader>
           <SheetTitle>
             {mode === "create" ? "Create scheduling" : "Edit scheduling"}
@@ -60,13 +62,13 @@ export default function SheetSchedualing({
 
         {mode === "create" ? (
           <SchedulingForm
-            onSuccess={() => onOpenChange(false)}
+            onSuccess={onSuccess}
             organizations={organizations}
           />
         ) : selectedItem ? (
           <SchedulingUpdateForm
             initialData={selectedItem}
-            onSuccess={() => onOpenChange(false)}
+            onSuccess={onSuccess}
             organizations={organizations}
           />
         ) : null}

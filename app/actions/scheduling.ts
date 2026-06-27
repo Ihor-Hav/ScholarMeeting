@@ -26,6 +26,14 @@ function normalizeOrganizationFields(
   } as const;
 }
 
+function mapEventToSchedulingWithId(event: any): schedulingWithId {
+  return {
+    ...event,
+    MeetingType: event.meetingType,
+    MeetingMembers: event.meetingMembers,
+  };
+}
+
 async function assertTeacherCanCreateOrganizationScheduling(
   userId: string,
   organizationId?: string | null,
@@ -68,6 +76,14 @@ export async function createSchedualing(
 
   try {
     const schedualeEvent = await prisma.event.create({
+      include: {
+        organization: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
       data: {
         title: input_data.title,
         description: input_data.description,
@@ -84,7 +100,7 @@ export async function createSchedualing(
       },
     });
 
-    return schedualeEvent;
+    return mapEventToSchedulingWithId(schedualeEvent);
   } catch (error) {
     console.error(error);
     throw new Error("Coulnd't create schedualing");
@@ -179,6 +195,14 @@ export async function updateSchedualById(
 
   try {
     const updated = await prisma.event.update({
+      include: {
+        organization: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
       where: { id },
       data: {
         title: data.title,
@@ -194,7 +218,7 @@ export async function updateSchedualById(
       },
     });
 
-    return updated;
+    return mapEventToSchedulingWithId(updated);
   } catch (error) {
     console.error(error);
     throw new Error("Couldn't find any data");

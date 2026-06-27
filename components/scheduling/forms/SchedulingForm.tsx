@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { schedulingSchema } from "@/schemas/scheduling.zod";
-import type { schedulingType } from "@/schemas/scheduling.shared";
+import type { schedulingType, schedulingWithId } from "@/schemas/scheduling.shared";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
 import { createSchedualing } from "@/app/actions/scheduling";
@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import type { SchedulingOrganizationOption } from "@/components/scheduling/fields/OrganizationRulesField";
 
 type Props = {
-  onSuccess: () => void;
+  onSuccess: (scheduling?: schedulingWithId) => void;
   organizations: SchedulingOrganizationOption[];
 };
 
@@ -43,9 +43,9 @@ export function SchedulingForm({ onSuccess, organizations }: Props) {
     if (!session?.user.id) return;
 
     try {
-      await createSchedualing(data, session.user.id);
+      const scheduling = await createSchedualing(data, session.user.id);
       toast.success("Scheduling created");
-      onSuccess();
+      onSuccess(scheduling);
     } catch {
       toast.error("Failed to create scheduling");
     }

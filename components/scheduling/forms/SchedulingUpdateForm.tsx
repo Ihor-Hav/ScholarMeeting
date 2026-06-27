@@ -17,7 +17,7 @@ import type { SchedulingOrganizationOption } from "@/components/scheduling/field
 
 type SchedulingUpdateFormProps = {
   initialData: schedulingWithId;
-  onSuccess: () => void;
+  onSuccess: (scheduling?: schedulingWithId) => void;
   organizations: SchedulingOrganizationOption[];
 };
 
@@ -49,9 +49,9 @@ export function SchedulingUpdateForm({
 
   const handleSubmit = async (data: schedulingType) => {
     try {
-      await updateSchedualById(data, initialData.id);
+      const scheduling = await updateSchedualById(data, initialData.id);
       toast.success("Scheduling updated");
-      onSuccess();
+      onSuccess(scheduling);
     } catch {
       toast.error("Failed to update scheduling");
     }
