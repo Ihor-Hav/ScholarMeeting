@@ -70,7 +70,11 @@ export function SchedulingUpdateForm({
       />
 
       <div className="flex justify-end gap-2 mt-5 mb-3">
-        <Button type="button" variant="outline" onClick={onSuccess}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => onSuccess()}
+        >
           Close
         </Button>
 
