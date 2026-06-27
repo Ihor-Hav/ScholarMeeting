@@ -82,7 +82,7 @@ const ProfileHeader = ({
 
   const handleReject = async () => {
     try {
-      await rejectConnection(user.id);
+      await rejectConnection(connectionId);
       router.refresh();
       toast.success("Request rejected");
     } catch (error) {

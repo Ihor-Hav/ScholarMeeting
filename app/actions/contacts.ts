@@ -39,12 +39,12 @@ export async function addContactRequest(
     where: {
       OR: [
         {
-          requested_by_id: requested_by_id,
           user1Id: contacted_id,
+          user2Id: requested_by_id,
         },
         {
-          requested_by_id: contacted_id,
           user1Id: requested_by_id,
+          user2Id: contacted_id,
         },
       ],
     },
