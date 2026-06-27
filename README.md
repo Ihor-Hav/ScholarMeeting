@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Scholar
 
-## Getting Started
+A meeting scheduling platform designed for educational institutions.
 
-First, run the development server:
+| | |
+|---|---|
+| 🌐 Live Demo | https://scholarshipmeetings.online |
+| 🚀 Tech Stack | Next.js • TypeScript • Prisma • PostgreSQL |
+| 🎥 Video Providers | Zoom • Google Meet |
+| 📄 License | MIT |
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## About
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Scholar is a scheduling platform focused on educational organizations.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Teachers can publish booking pages that allow students to reserve available meeting slots. Meetings can be conducted online using Zoom or Google Meet or held in person.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The platform also provides organization management, contact management, calendar synchronization, and a complete meeting history.
 
-## Learn More
+## Features
 
-To learn more about Next.js, take a look at the following resources:
+### 📅 Scheduling Pages
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Create reusable booking pages with configurable meeting duration, availability, and meeting provider.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Students can reserve available time slots directly from the teacher's public profile.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 👥 Organizations
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Manage educational organizations with role-based permissions.
+
+Current roles:
+
+- Owner
+- Teacher
+- Student
+
+Users can also schedule meetings independently outside an organization.
+
+---
+
+### 📆 Calendar
+
+View all meetings inside an integrated calendar.
+
+Upcoming meetings are automatically displayed on their scheduled dates.
+
+---
+
+### 🎥 Video Meeting Integrations
+
+Supported providers:
+
+- Zoom
+- Google Meet
+
+Meetings can also be marked as in-person.
+
+---
+
+### 🤝 Contacts
+
+Store frequently used contacts for faster scheduling.
+
+---
+
+### 📖 Meetings
+
+Complete history of meetings where the user is either:
+
+- Host
+- Participant
+
+Meeting status includes:
+
+- Scheduled
+- Accepted
+- Declined
+- Cancelled
+
+---
+
+### 🔌 Plugins
+
+Connect external providers.
+
+Currently supported:
+
+- Zoom
+- Google
+
+## Demo Notice
+
+This application was built as a portfolio project to demonstrate software architecture, UI/UX, authentication, scheduling, and third-party integrations.
+
+Some integrations are intentionally limited due to external service requirements.
+
+### Current limitations
+
+- ✅ Zoom meeting integration is fully functional.
+- ⚠️ Google Meet integration is unavailable because Google requires OAuth verification before allowing production access.
+- The source code contains the complete integration, but production usage is blocked until verification is approved by Google.
+- ⚠️ This repository is a portfolio project intended for demonstration purposes.
