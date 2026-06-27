@@ -19,9 +19,23 @@ The platform also provides organization management, contact management, calendar
 
 ## Features
 
-### 📅 Scheduling Pages
+### 📅 Availability
 
-Create reusable booking pages with configurable meeting duration, availability, and meeting provider.
+Create reusable scheduling pages that define when and how other users can book meetings with you.
+
+Configure your availability by selecting:
+
+- Available days of the week
+- Time slots
+- Time zone
+
+<img width="768" height="415" alt="Availability" src="https://github.com/user-attachments/assets/022cd792-135a-4d74-8599-4ef42a87850b" />
+
+---
+
+### 📅 Scheduling Page
+
+Create reusable booking templates with configurable meeting duration, availability, and meeting provider.
 
 Students can reserve available time slots directly from the teacher's public profile.
 
@@ -79,9 +93,9 @@ Complete history of meetings where the user is either:
 
 Meeting status includes:
 
-- Scheduled
-- Accepted
-- Declined
+- Active
+- Not Approved
+- Past
 - Cancelled
 
   <img width="800" height="432" alt="Meetings" src="https://github.com/user-attachments/assets/35febe32-05b7-40ab-8501-dc2a48c3e981" />
@@ -107,5 +121,5 @@ Some integrations are intentionally limited due to external service requirements
 
 - ✅ Zoom meeting integration is fully functional.
 - ⚠️ Google Meet integration is unavailable because Google requires OAuth verification before allowing production access.
-- The source code contains the complete integration, but production usage is blocked until verification is approved by Google.
+- ⚠️ The source code contains the complete integration, but production usage is blocked until verification is approved by Google.
 - ⚠️ This repository is a portfolio project intended for demonstration purposes.
