@@ -1,0 +1,354 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String  @id @default(cuid())
+  email        String  @unique
+  invite_token String? @unique
+  avatarUrl    String?
+  name         String
+  lastname     String
+  password     String
+
+  events                  Event[]
+  privateScheduleAccesses PrivateScheduleAccess[]
+  organizedMeetings       Meeting[]               @relation("OrganizedMeetings")
+
+  meetingParticipants MeetingParticipant[] @relation("MeetingParticipants")
+  meetingComments     MeetingComment[]
+
+  availability Availability[]
+
+  connectionsAsUser1 Connections[] @relation("User1Connections")
+  connectionsAsUser2 Connections[] @relation("User2Connections")
+
+  organizationMemberships OrganizationMember[]
+  ownedOrganizations      Organization[]       @relation("OrganizationOwner")
+  passwordResetTokens     PasswordResetToken[]
+
+  googleAccount GoogleAccount?
+  zoomAccount   ZoomAccount?
+
+  @@index([invite_token])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  tokenHash String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([tokenHash])
+}
+
+model Organization {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  description String?
+
+  ownerId String
+  owner   User   @relation("OrganizationOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  members OrganizationMember[]
+  events  Event[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+}
+
+model OrganizationMember {
+  id String @id @default(cuid())
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  role OrganizationRole
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+  @@index([organizationId, role])
+}
+
+enum OrganizationRole {
+  OWNER
+  TEACHER
+  STUDENT
+}
+
+model GoogleAccount {
+  id String @id @default(cuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  accessToken         String
+  refreshToken        String?
+  isCalendarConnected Boolean?
+  expiresAt           DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ZoomAccount {
+  id String @id @default(cuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  accessToken  String
+  refreshToken String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Connections {
+  id String @id @default(ulid())
+
+  user1Id         String
+  user2Id         String
+  requested_by_id String
+
+  user1 User @relation("User1Connections", fields: [user1Id], references: [id], onDelete: Cascade)
+
+  user2 User @relation("User2Connections", fields: [user2Id], references: [id], onDelete: Cascade)
+
+  status ConnectionsStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([user1Id, user2Id])
+}
+
+enum ConnectionsStatus {
+  PENDING
+  ACCEPTED
+  BLOCKED
+}
+
+model Event {
+  id          String  @id @default(ulid())
+  title       String
+  description String?
+
+  week_days Int[]
+  duration  Int
+
+  hostId String
+  host   User   @relation(fields: [hostId], references: [id], onDelete: Cascade)
+
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  location          String?
+  max_members       Int?
+  bookingVisibility BookingVisibilities @default(PUBLIC)
+
+  meetingType       MeetingType       @default(GOOGLE_MEET)
+  meetingMembers    MeetingMembers    @default(ONE_ON_ONE)
+  requiredHostRole  OrganizationRole?
+  requiredGuestRole OrganizationRole?
+
+  meetings            Meeting[]
+  privateAccessGrants PrivateScheduleAccess[]
+
+  invite_token String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([requiredHostRole, requiredGuestRole])
+}
+
+model PrivateScheduleAccess {
+  id String @id @default(cuid())
+
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([eventId, userId])
+  @@index([userId])
+}
+
+model Meeting {
+  id          String  @id @default(ulid())
+  title       String
+  description String?
+
+  organizerId String
+  organizer   User   @relation("OrganizedMeetings", fields: [organizerId], references: [id], onDelete: Cascade)
+
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  startDate DateTime
+  endDate   DateTime
+  status    MeetingStatus @default(SCHEDULED)
+
+  meetingType MeetingType @default(GOOGLE_MEET)
+
+  location    String?
+  meetingLink String?
+
+  inviteToken String @unique
+
+  slot Slot? @relation("SlotMeeting")
+
+  participants MeetingParticipant[]
+  comments     MeetingComment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizerId])
+  @@index([startDate])
+  @@index([inviteToken])
+}
+
+model MeetingComment {
+  id String @id @default(cuid())
+
+  meetingId String
+  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  body String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([meetingId, createdAt])
+  @@index([authorId])
+}
+
+enum MeetingStatus {
+  SCHEDULED
+  CANCELLED
+}
+
+enum MeetingType {
+  GOOGLE_MEET
+  ZOOM
+  IN_PERSON
+}
+
+enum MeetingMembers {
+  ONE_ON_ONE
+  GROUP
+  ORGANIZATION
+}
+
+enum BookingVisibilities {
+  PUBLIC
+  CONTACTS
+  PRIVATE
+  ORGANIZATION
+}
+
+model MeetingParticipant {
+  id String @id @default(ulid())
+
+  meetingId String
+  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation("MeetingParticipants", fields: [userId], references: [id], onDelete: Cascade)
+
+  status ParticipantStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+
+  roleSnapshot OrganizationRole?
+
+  @@unique([meetingId, userId])
+  @@index([userId])
+}
+
+enum ParticipantStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  CANCELLED
+}
+
+model Availability {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  organizationId String?
+
+  dayOfWeek Int?
+
+  startTime DateTime
+  endTime   DateTime
+
+  slotDuration Int
+
+  timezone String?
+
+  isActive Boolean @default(true)
+
+  slots Slot[] @relation("AvailabilitySlots")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([organizationId])
+}
+
+model Slot {
+  id String @id @default(cuid())
+
+  availabilityId String
+
+  availability Availability @relation("AvailabilitySlots", fields: [availabilityId], references: [id], onDelete: Cascade)
+
+  startDate DateTime
+  endDate   DateTime
+
+  status SlotStatus @default(FREE)
+
+  meetingId String?  @unique
+  meeting   Meeting? @relation("SlotMeeting", fields: [meetingId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([availabilityId])
+  @@index([startDate])
+}
+
+enum SlotStatus {
+  FREE
+  BOOKED
+}
