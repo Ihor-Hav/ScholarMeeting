@@ -12,7 +12,7 @@ import {
 import { Field, FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, type MouseEvent } from "react";
 import { findContact } from "@/app/actions/contacts";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -48,15 +48,17 @@ const DialogContacts = ({
     }
   }
 
-  async function addNewContact() {
+  async function addNewContact(event?: MouseEvent<HTMLButtonElement>) {
+    event?.preventDefault();
+    event?.stopPropagation();
+
     if (!contact || userId === null) {
       console.error(contact);
       console.error("User id: ", userId);
       return;
     }
+
     try {
-      console.error("Contact ", contact);
-      console.error("userId ", userId);
       const newContact = await addContactRequest(userId, contact.id);
 
       if (!newContact) throw Error("Couldn't establish somethign");
@@ -108,39 +110,40 @@ const DialogContacts = ({
             <>
               <Separator />
 
-              <Link href={`/profile/${contact.id}`} className="block">
-                <Card className="border-muted my-0.5 py-0.5 cursor-pointer hover:bg-muted/50 transition">
-                  <CardContent className="flex items-center justify-between p-4">
-                    <div className="flex items-center gap-3">
-                      <Avatar>
-                        <AvatarImage src="https://github.com/shadcn.png" />
-                        <AvatarFallback>
-                          {String(contact.name?.[0] ?? "U")}
-                        </AvatarFallback>
-                      </Avatar>
+              <Card className="border-muted my-0.5 py-0.5 hover:bg-muted/50 transition">
+                <CardContent className="flex items-center justify-between gap-3 p-4">
+                  <Link
+                    href={`/profile/${contact.id}`}
+                    className="flex min-w-0 flex-1 items-center gap-3"
+                  >
+                    <Avatar>
+                      <AvatarImage src="https://github.com/shadcn.png" />
+                      <AvatarFallback>
+                        {String(contact.name?.[0] ?? "U")}
+                      </AvatarFallback>
+                    </Avatar>
 
-                      <div className="leading-tight">
-                        <p className="font-medium">
-                          {String(contact.name + " " + contact.lastname).trim()}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Potential contact
-                        </p>
-                      </div>
+                    <div className="min-w-0 leading-tight">
+                      <p className="truncate font-medium">
+                        {String(contact.name + " " + contact.lastname).trim()}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Potential contact
+                      </p>
                     </div>
+                  </Link>
 
-                    <Button
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation(); // ❗ ключ
-                        addNewContact();
-                      }}
-                    >
-                      Add
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Link>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={(e) => {
+                      void addNewContact(e);
+                    }}
+                  >
+                    Add
+                  </Button>
+                </CardContent>
+              </Card>
             </>
           )}
         </div>
