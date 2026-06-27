@@ -6,6 +6,7 @@ import {
   Clock3,
   ExternalLink,
   MapPin,
+  RotateCcw,
   Users,
   Video,
 } from "lucide-react";
@@ -22,6 +23,7 @@ type MeetingCardProps = {
   location?: string;
   meetingLink?: string | null;
   meetingUrl?: string | null;
+  rescheduleHref?: string;
   participantsCount?: number;
   isOrganizer?: boolean;
   meetingStatus?: "SCHEDULED" | "CANCELLED";
@@ -44,6 +46,7 @@ function MeetingCard({
   location,
   meetingLink,
   meetingUrl,
+  rescheduleHref,
   participantsCount = 0,
   isOrganizer = false,
   meetingStatus = "SCHEDULED",
@@ -51,10 +54,15 @@ function MeetingCard({
   children,
 }: MeetingCardProps) {
   const onlineMeetingLink = meetingLink ?? meetingUrl;
+
   const canJoin =
     meetingStatus !== "CANCELLED" &&
     meetingType !== "IN_PERSON" &&
     Boolean(onlineMeetingLink);
+
+  const canReschedule =
+    meetingStatus !== "CANCELLED" && Boolean(rescheduleHref);
+
   const meetingDate = useMemo(
     () =>
       startDate.toLocaleDateString([], {
@@ -64,6 +72,7 @@ function MeetingCard({
       }),
     [startDate],
   );
+
   const meetingTime = useMemo(
     () =>
       `${startDate.toLocaleTimeString([], {
@@ -134,15 +143,11 @@ function MeetingCard({
           </div>
         </div>
 
-        {canJoin || children ? (
-          <div className="mt-5 flex flex-wrap items-center gap-2 border-t pt-4">
+        {(canJoin || canReschedule) && (
+          <div className="mt-5 flex flex-wrap items-center gap-2">
             {canJoin && (
               <Button asChild size="sm">
-                <a
-                  href={onlineMeetingLink ?? "#"}
-                  target="_blank"
-                  rel="noreferrer"
-                >
+                <a href={onlineMeetingLink!} target="_blank" rel="noreferrer">
                   <Video className="size-4" />
                   Join meeting
                   <ExternalLink className="size-3.5" />
@@ -150,9 +155,22 @@ function MeetingCard({
               </Button>
             )}
 
+            {canReschedule && (
+              <Button asChild size="sm" variant="outline">
+                <a href={rescheduleHref}>
+                  <RotateCcw className="size-4" />
+                  Reschedule
+                </a>
+              </Button>
+            )}
+          </div>
+        )}
+
+        {children && (
+          <div className="mt-5 flex flex-wrap items-center gap-2 border-t pt-4">
             {children}
           </div>
-        ) : null}
+        )}
       </CardContent>
     </Card>
   );
