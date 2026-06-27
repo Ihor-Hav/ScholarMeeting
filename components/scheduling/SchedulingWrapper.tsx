@@ -162,6 +162,7 @@ export default function SchedulingWrapper({
         <SheetSchedualing
           open={open}
           onOpenChange={setOpen}
+          onSuccess={handleFormSuccess}
           mode={mode}
           selectedItem={item}
           organizations={organizations}
