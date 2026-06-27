@@ -35,6 +35,7 @@ type UpdatingAction = {
 type MeetingBuckets = {
   activeMeetings: MeetingWithFullOrganizer[];
   pendingMeetings: MeetingWithFullOrganizer[];
+  pastMeetings: MeetingWithFullOrganizer[];
   cancelledMeetings: MeetingWithFullOrganizer[];
 };
 
@@ -72,12 +73,20 @@ export default function MeetingWrapper({
     useState<MeetingWithFullOrganizer | null>(null);
   const userId = session.user.id;
 
-  const { activeMeetings, pendingMeetings, cancelledMeetings } =
+  const { activeMeetings, pendingMeetings, pastMeetings, cancelledMeetings } =
     useMemo<MeetingBuckets>(() => {
+      const now = new Date().getTime();
+
       return meetings.reduce<MeetingBuckets>(
         (buckets, meeting) => {
           const participantStatus = getParticipantStatus(meeting, userId);
           const isOrganizer = meeting.organizerId === userId;
+          const isPast = meeting.endDate.getTime() < now;
+
+          if (meeting.status === "SCHEDULED" && isPast) {
+            buckets.pastMeetings.push(meeting);
+            return buckets;
+          }
 
           if (
             meeting.status === "SCHEDULED" &&
@@ -108,6 +117,7 @@ export default function MeetingWrapper({
         {
           activeMeetings: [],
           pendingMeetings: [],
+          pastMeetings: [],
           cancelledMeetings: [],
         },
       );
@@ -275,6 +285,9 @@ export default function MeetingWrapper({
             <TabsTrigger value="pending">
               Not approved ({pendingMeetings.length})
             </TabsTrigger>
+            <TabsTrigger value="past">
+              Past ({pastMeetings.length})
+            </TabsTrigger>
             <TabsTrigger value="cancelled">
               Cancelled ({cancelledMeetings.length})
             </TabsTrigger>
@@ -291,6 +304,9 @@ export default function MeetingWrapper({
               "No meetings are waiting for your approval",
               { showPendingActions: true },
             )}
+          </TabsContent>
+          <TabsContent value="past" className="mt-4">
+            {renderMeetings(pastMeetings, "No past meetings found")}
           </TabsContent>
           <TabsContent value="cancelled" className="mt-4">
             {renderMeetings(cancelledMeetings, "No cancelled meetings found")}
