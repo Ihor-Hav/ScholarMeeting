@@ -38,8 +38,7 @@ export default async function SchedulingPage({
       role:
         organization.members.find(
           (member: { userId: string }) => member.userId === session.user.id,
-        )
-          ?.role || "STUDENT",
+        )?.role || "STUDENT",
     }),
   );
 

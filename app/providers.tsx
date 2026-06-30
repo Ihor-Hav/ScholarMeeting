@@ -2,6 +2,7 @@
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { SessionProvider } from "next-auth/react";
+import { Analytics } from "@vercel/analytics/next";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -9,6 +10,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       <ThemeProvider attribute="class" defaultTheme="dark">
         {children}
       </ThemeProvider>
+
+      <Analytics />
     </SessionProvider>
   );
 }
